@@ -3,7 +3,7 @@ from typing import List, Dict
 from huggingface_hub import InferenceClient
 
 class Agent:
-    def __init__(self, model: str = "meta-llama/Llama-4-Scout-17B-16E-Instruct", system_prompt: str = "You are an expert career coach for fresh graduates. Your goal is to help them secure jobs, internships, and scholarships by tailoring their CVs and providing actionable advice."):
+    def __init__(self, model: str = "meta-llama/Llama-3.1-8B-Instruct", system_prompt: str = "You are an expert career coach for fresh graduates. Your goal is to help them secure jobs, internships, and scholarships by tailoring their CVs and providing actionable advice."):
         self.model = model
         self.system_prompt = system_prompt
         self.history: List[Dict[str, str]] = [

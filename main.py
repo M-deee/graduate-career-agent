@@ -13,7 +13,7 @@ load_dotenv()
 app = FastAPI()
 
 # Initialize the agent
-agent = Agent(model="meta-llama/Llama-4-Scout-17B-16E-Instruct")
+agent = Agent()
 
 class ChatRequest(BaseModel):
     message: str
