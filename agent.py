@@ -10,12 +10,12 @@ class Agent:
             {"role": "system", "content": system_prompt}
         ]
         # Hardcoded token as per previous user request/fix
-        self.api_token = os.getenv("HUGGINGFACEHUB_API_KEY")
+        self.api_token = os.getenv("HF_TOKEN")
         
         print(f"HF KEY loaded: {bool(self.api_token)}") # Debug print as requested
         
         if not self.api_token:
-            print("Warning: HUGGINGFACEHUB_API_KEY is not set.")
+            print("Warning: HF_TOKEN is not set.")
             
         self.client = InferenceClient(model=self.model, token=self.api_token)
 
