@@ -2,15 +2,26 @@ from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
+from typing import Optional
 from agent import Agent
 import os
 import io
 from pypdf import PdfReader
 from dotenv import load_dotenv
+import subprocess
+import re
+import uuid
+from pathlib import Path
+import shutil
+import traceback
 
 load_dotenv()
 
 app = FastAPI()
+
+# Ensure generated directory exists
+GENERATED_DIR = Path("static/generated")
+GENERATED_DIR.mkdir(parents=True, exist_ok=True)
 
 # Initialize the agent
 agent = Agent()
@@ -20,6 +31,7 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     response: str
+    pdf_url: Optional[str] = None
 
 
 
@@ -42,9 +54,52 @@ async def tailor_cv_endpoint(file: UploadFile = File(...), job_description: str 
             cv_text += page.extract_text() + "\n"
             
         # Call agent to tailor CV
-        response = agent.tailor_cv(cv_text, job_description)
-        return ChatResponse(response=response)
+        response_text = agent.tailor_cv(cv_text, job_description)
+        
+        # Extract LaTeX code
+        latex_match = re.search(r'\[LATEX_START\](.*?)\[LATEX_END\]', response_text, re.DOTALL)
+        pdf_url = None
+        
+        if latex_match:
+            latex_code = latex_match.group(1).strip()
+            # Clean up the response text by removing the LaTeX block
+            response_text = response_text.replace(latex_match.group(0), "").strip()
+            
+            # Generate unique filename
+            file_id = str(uuid.uuid4())
+            tex_file = GENERATED_DIR / f"{file_id}.tex"
+            pdf_file = GENERATED_DIR / f"{file_id}.pdf"
+            
+            # Write LaTeX to file
+            with open(tex_file, "w") as f:
+                f.write(latex_code)
+                
+            # Compile PDF
+            try:
+                # Run pdflatex twice to resolve references
+                subprocess.run(["pdflatex", "-interaction=nonstopmode", "-output-directory", str(GENERATED_DIR), str(tex_file)], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                
+                if pdf_file.exists():
+                    pdf_url = f"/static/generated/{file_id}.pdf"
+                    
+                # Clean up auxiliary files
+                for ext in ['.aux', '.log', '.out', '.tex']:
+                    aux_file = GENERATED_DIR / f"{file_id}{ext}"
+                    if aux_file.exists():
+                        aux_file.unlink()
+                        
+            except FileNotFoundError:
+                print("Error: pdflatex not found. Please install texlive-latex-base.")
+                # Continue without PDF
+                pass
+            except subprocess.CalledProcessError as e:
+                print(f"Error compiling LaTeX: {e}")
+                # Don't fail the request, just don't return a PDF URL
+                pass
+
+        return ChatResponse(response=response_text, pdf_url=pdf_url)
     except Exception as e:
+        traceback.print_exc() # Print full traceback
         raise HTTPException(status_code=500, detail=f"Error processing file: {str(e)}")
 
 @app.post("/api/reset")

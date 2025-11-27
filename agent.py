@@ -3,7 +3,7 @@ from typing import List, Dict
 from huggingface_hub import InferenceClient
 
 class Agent:
-    def __init__(self, model: str = "meta-llama/Llama-3.1-8B-Instruct", system_prompt: str = "You are an expert career coach for fresh graduates. Your goal is to help them secure jobs, internships, and scholarships by tailoring their CVs and providing actionable advice."):
+    def __init__(self, model: str = "meta-llama/Llama-3.1-8B-Instruct", system_prompt: str = "You are a professional career coach specializing in helping fresh graduates secure jobs, internships, and scholarships. Provide precise, practical guidance. When rewriting CVs or documents, follow best industry standards, use clear and concise language, and focus on measurable achievements. Always maintain accuracy and avoid inventing information."):
         self.model = model
         self.system_prompt = system_prompt
         self.history: List[Dict[str, str]] = [
@@ -52,16 +52,32 @@ class Agent:
             return "Error: HF_TOKEN is not set."
 
         prompt = f"""
-        I have a CV and a Job Description (JD). Please rewrite the CV to better match the JD.
-        Highlight relevant skills, adjust the summary, and optimize bullet points.
-        
+        You will receive a Job Description (JD) and a CV. Rewrite the CV so that it aligns more closely with the JD.
+
+        Your tasks:
+        1. Strengthen the summary to match the employer's needs.
+        2. Emphasize relevant skills and experience from the CV—do not invent information.
+        3. Improve bullet points using action verbs and measurable impact where appropriate.
+        4. Remove irrelevant details that do not support the JD.
+        5. Maintain clarity, structure, and a professional tone.
+
+        Return:
+        1. A complete, compilable LaTeX file using the `moderncv` class.
+        2. A short, bullet-point explanation describing what changes were made and why.
+
+        IMPORTANT:
+        - Use the `moderncv` class:
+          \\documentclass[11pt,a4paper,sans]{{moderncv}}
+          \\moderncvstyle{{classic}}
+          \\moderncvcolor{{blue}}
+        - Wrap the LaTeX code strictly between `[LATEX_START]` and `[LATEX_END]` tags for extraction.
+        - Ensure all special characters are properly escaped for LaTeX.
+
         JOB DESCRIPTION:
         {job_description}
-        
-        CURRENT CV:
+
+        CV TO TAILOR:
         {cv_text}
-        
-        Please provide the tailored CV in Markdown format, followed by a brief explanation of changes.
         """
         
         # We don't add this to the main chat history to keep the context clean, 
@@ -91,11 +107,14 @@ class Agent:
 
     def analyze_jd(self, jd_text: str, cv_text: str) -> str:
         prompt = f"""
-        Analyze the following Job Description (JD) and Candidate CV.
-        Provide:
-        1. List of required skills, tools, and qualifications from the JD.
-        2. Gap analysis: What is missing in the CV compared to the JD?
-        3. Priority scoring: Rank the missing skills by importance (High/Medium/Low).
+        You will compare a Job Description (JD) with a candidate's CV.
+
+        Perform the following tasks:
+        1. Extract the required skills, tools, responsibilities, and qualifications from the JD.
+        2. Perform a gap analysis: identify which important items from the JD are missing in the CV. Do not assume or invent skills.
+        3. Rank each missing skill or qualification by importance using High / Medium / Low, based strictly on the JD.
+
+        Return the results in a clear, structured Markdown format.
 
         JOB DESCRIPTION:
         {jd_text}
@@ -107,11 +126,17 @@ class Agent:
 
     def extract_skills(self, cv_text: str) -> str:
         prompt = f"""
-        Extract all skills from the following CV and categorize them into:
-        - Technical Skills
-        - Soft Skills
-        - Domain-Specific Skills
-        
+        Extract skills from the CV and categorize them into:
+
+        - Technical Skills  
+        - Soft Skills  
+        - Domain-Specific / Industry Skills  
+
+        Rules:
+        - Only extract skills explicitly mentioned in the CV.  
+        - Do not infer or add skills that are not present.  
+        - Present results in a clean Markdown list.
+
         CV CONTENT:
         {cv_text}
         """
@@ -119,12 +144,19 @@ class Agent:
 
     def estimate_ats_score(self, cv_text: str) -> str:
         prompt = f"""
-        Analyze the following CV for ATS (Applicant Tracking System) compatibility.
-        Provide:
-        1. Estimated ATS Score (0-100).
-        2. Formatting issues (e.g., tables, columns, graphics).
-        3. Keyword density analysis.
-        4. Suggestions for improvement.
+        Evaluate this CV for ATS (Applicant Tracking System) compatibility.
+
+        Provide the following:
+
+        1. **Estimated ATS Score (0–100)** based on keyword alignment, structure, readability, and formatting.
+        2. **Formatting Issues**  
+           Identify problems such as: tables, columns, graphics, excessive styling, unreadable headers, unusual fonts, missing sections, or non-ATS-safe elements.
+        3. **Keyword Analysis**  
+           Extract important keywords and indicate how well the CV uses them.
+        4. **Actionable Recommendations**  
+           Suggest practical changes to improve ATS compatibility. Do not add fictional experience.
+
+        Return the results in a structured Markdown format.
 
         CV CONTENT:
         {cv_text}
@@ -133,12 +165,17 @@ class Agent:
 
     def summarize_jd(self, jd_text: str) -> str:
         prompt = f"""
-        Summarize the following Job Posting into a structured format:
-        - Key Responsibilities
-        - Critical Skills
-        - Nice-to-have Requirements
-        - Company Expectations
-        - Cultural Attributes
+        Summarize the following Job Posting into a structured and concise format.
+
+        Include:
+
+        - **Key Responsibilities**
+        - **Critical Skills and Requirements**
+        - **Nice-to-Have Skills**
+        - **Company Expectations**
+        - **Cultural or Workplace Attributes** (only if explicitly mentioned)
+
+        Do not add information that is not present in the JD.
 
         JOB POSTING:
         {jd_text}

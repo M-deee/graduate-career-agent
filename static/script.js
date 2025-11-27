@@ -365,6 +365,26 @@ async function handleCVSubmit(e) {
             resultDiv.classList.add('show');
 
             resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            if (data.pdf_url) {
+                const downloadBtn = document.createElement('a');
+                downloadBtn.href = data.pdf_url;
+                downloadBtn.className = 'submit-button download-btn';
+                downloadBtn.style.marginTop = '20px';
+                downloadBtn.style.display = 'inline-flex';
+                downloadBtn.style.textDecoration = 'none';
+                downloadBtn.innerHTML = `
+                    <span class="btn-content">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        <span>Download PDF CV</span>
+                    </span>
+                `;
+                resultDiv.appendChild(downloadBtn);
+            }
         } else if (data.error) {
             alert('Error: ' + data.error);
         }
