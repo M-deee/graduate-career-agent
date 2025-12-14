@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Graduate Career Agent</title>
+    <title>Gradpilot</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -27,9 +27,17 @@
                     <span class="badge-icon">🎓</span>
                 </div>
                 <div class="header-text">
-                    <h1>Graduate Career Agent</h1>
+                    <h1>Gradpilot</h1>
                     <p class="tagline">Your AI-powered career companion for success</p>
                 </div>
+                <button id="logout-btn" class="reset-button" style="margin-left: auto;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                    Logout
+                </button>
             </div>
             <div class="header-decoration">
                 <div class="floating-shape shape-1"></div>
@@ -61,232 +69,254 @@
             </button>
         </nav>
 
-        <main class="content glass-card">
-            <div id="chat-tab" class="tab-content active">
-                <div class="chat-container">
-                    <div class="chat-header">
-                        <div class="chat-header-info">
-                            <div class="chat-avatar-status">
-                                <span class="status-dot"></span>
+        <div class="main-layout">
+            <main class="content glass-card">
+                <div id="chat-tab" class="tab-content active">
+                    <!-- Chat content (unchanged) -->
+                    <div class="chat-container">
+                        <div class="chat-header">
+                            <div class="chat-header-info">
+                                <div class="chat-avatar-status">
+                                    <span class="status-dot"></span>
+                                </div>
+                                <div class="chat-header-text">
+                                    <h2>Career Coach Chat</h2>
+                                    <span class="online-status">Online and ready to help</span>
+                                </div>
                             </div>
-                            <div class="chat-header-text">
-                                <h2>Career Coach Chat</h2>
-                                <span class="online-status">Online and ready to help</span>
-                            </div>
+                            <button id="reset-btn" class="reset-button">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                                    <path d="M3 3v5h5" />
+                                </svg>
+                                Reset
+                            </button>
                         </div>
-                        <button id="reset-btn" class="reset-button">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                                <path d="M3 3v5h5" />
-                            </svg>
-                            Reset
-                        </button>
-                    </div>
-                    <div id="chat-messages" class="chat-messages">
-                        <div class="message bot-message">
-                            <div class="message-avatar">🤖</div>
-                            <div class="message-content">
-                                <p>Hello! I'm your Graduate Career Agent. I can help you with:</p>
-                                <ul>
-                                    <li>Career advice and guidance</li>
-                                    <li>Interview preparation</li>
-                                    <li>Job search strategies</li>
-                                    <li>CV and cover letter tips</li>
-                                </ul>
-                                <p>How can I assist you today?</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chat-input-container">
-                        <div class="input-wrapper">
-                            <input type="text" id="chat-input" placeholder="Type your message here..."
-                                autocomplete="off">
-                        </div>
-                        <button id="send-btn" class="send-button">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <line x1="22" y1="2" x2="11" y2="13" />
-                                <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                            </svg>
-                            <span>Send</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="cv-tab" class="tab-content">
-                <div class="cv-container">
-                    <div class="cv-header">
-                        <div class="cv-icon-wrapper">
-                            <span class="cv-icon">📄</span>
-                        </div>
-                        <h2>CV Tailoring Service</h2>
-                        <p class="cv-description">Upload your CV and paste the job description to get personalized
-                            recommendations</p>
-                    </div>
-
-                    <form id="cv-form" class="cv-form">
-                        <div class="form-group">
-                            <label for="cv-file">
-                                <span class="label-icon">📎</span>
-                                Upload Your CV (PDF)
-                            </label>
-                            <div class="file-input-wrapper">
-                                <div class="file-drop-zone">
-                                    <input type="file" id="cv-file" accept=".pdf" required>
-                                    <div class="file-drop-content">
-                                        <span class="upload-icon">
-                                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-                                                stroke="currentColor" stroke-width="1.5">
-                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                                <polyline points="17 8 12 3 7 8" />
-                                                <line x1="12" y1="3" x2="12" y2="15" />
-                                            </svg>
-                                        </span>
-                                        <span class="drop-text">Drag & drop your CV here or click to browse</span>
-                                        <span class="file-name">No file selected</span>
-                                    </div>
+                        <div id="chat-messages" class="chat-messages">
+                            <div class="message bot-message">
+                                <div class="message-avatar">🤖</div>
+                                <div class="message-content">
+                                    <p>Hello! I'm Gradpilot. I can help you with:</p>
+                                    <ul>
+                                        <li>Career advice and guidance</li>
+                                        <li>Interview preparation</li>
+                                        <li>Job search strategies</li>
+                                        <li>CV and cover letter tips</li>
+                                    </ul>
+                                    <p>How can I assist you today?</p>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="form-group">
-                            <label for="job-description">
-                                <span class="label-icon">📋</span>
-                                Job Description
-                            </label>
-                            <textarea id="job-description" placeholder="Paste the complete job description here..."
-                                rows="8" required></textarea>
-                        </div>
-
-                        <button type="submit" class="submit-button">
-                            <span class="btn-content">
+                        <div class="chat-input-container">
+                            <div class="input-wrapper">
+                                <input type="text" id="chat-input" placeholder="Type your message here..."
+                                    autocomplete="off">
+                            </div>
+                            <button id="send-btn" class="send-button">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2">
-                                    <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                                    <path d="M2 17l10 5 10-5" />
-                                    <path d="M2 12l10 5 10-5" />
+                                    <line x1="22" y1="2" x2="11" y2="13" />
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
                                 </svg>
-                                <span>Tailor My CV</span>
-                            </span>
-                            <span class="btn-shimmer"></span>
-                        </button>
-                    </form>
-
-                    <div id="cv-result" class="cv-result"></div>
-                </div>
-            </div>
-
-            <div id="analysis-tab" class="tab-content">
-                <div class="cv-container">
-                    <div class="cv-header">
-                        <div class="cv-icon-wrapper">
-                            <span class="cv-icon">🔍</span>
+                                <span>Send</span>
+                            </button>
                         </div>
-                        <h2>Job Analysis & Summarization</h2>
-                        <p class="cv-description">Analyze job descriptions and compare them with your CV</p>
                     </div>
+                </div>
 
-                    <div class="action-buttons"
-                        style="display: flex; gap: 16px; margin-bottom: 24px; justify-content: center;">
-                        <button id="analyze-jd-btn" class="submit-button" style="width: auto; padding: 12px 24px;">
-                            <span class="btn-content">Analyze Gap</span>
-                        </button>
-                        <button id="summarize-jd-btn" class="submit-button" style="width: auto; padding: 12px 24px;">
-                            <span class="btn-content">Summarize JD</span>
-                        </button>
-                    </div>
+                <div id="cv-tab" class="tab-content">
+                    <div class="cv-container">
+                        <div class="cv-header">
+                            <div class="cv-icon-wrapper">
+                                <span class="cv-icon">📄</span>
+                            </div>
+                            <h2>CV Tailoring Service</h2>
+                            <p class="cv-description">Upload your CV and paste the job description to get personalized
+                                recommendations</p>
+                        </div>
 
-                    <form id="analysis-form" class="cv-form">
-                        <div class="form-group">
-                            <label for="analysis-cv-file">
-                                <span class="label-icon">📎</span>
-                                Upload Your CV (PDF)
-                            </label>
-                            <div class="file-input-wrapper">
-                                <div class="file-drop-zone">
-                                    <input type="file" id="analysis-cv-file" accept=".pdf">
-                                    <div class="file-drop-content">
-                                        <span class="upload-icon">
-                                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-                                                stroke="currentColor" stroke-width="1.5">
-                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                                <polyline points="17 8 12 3 7 8" />
-                                                <line x1="12" y1="3" x2="12" y2="15" />
-                                            </svg>
-                                        </span>
-                                        <span class="drop-text">Drag & drop your CV here or click to browse</span>
-                                        <span class="file-name" id="analysis-file-name">No file selected</span>
+                        <form id="cv-form" class="cv-form">
+                            <div class="form-group">
+                                <label for="cv-file">
+                                    <span class="label-icon">📎</span>
+                                    Upload Your CV (PDF)
+                                </label>
+                                <div class="file-input-wrapper">
+                                    <div class="file-drop-zone">
+                                        <input type="file" id="cv-file" accept=".pdf" required>
+                                        <div class="file-drop-content">
+                                            <span class="upload-icon">
+                                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                                                    stroke="currentColor" stroke-width="1.5">
+                                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                                    <polyline points="17 8 12 3 7 8" />
+                                                    <line x1="12" y1="3" x2="12" y2="15" />
+                                                </svg>
+                                            </span>
+                                            <span class="drop-text">Drag & drop your CV here or click to browse</span>
+                                            <span class="file-name">No file selected</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="form-group">
-                            <label for="analysis-job-description">
-                                <span class="label-icon">📋</span>
-                                Job Description
-                            </label>
-                            <textarea id="analysis-job-description"
-                                placeholder="Paste the complete job description here..." rows="8"></textarea>
-                        </div>
-                    </form>
+                            <div class="form-group">
+                                <label for="job-description">
+                                    <span class="label-icon">📋</span>
+                                    Job Description
+                                </label>
+                                <textarea id="job-description" placeholder="Paste the complete job description here..."
+                                    rows="8" required></textarea>
+                            </div>
 
-                    <div id="analysis-result" class="cv-result"></div>
+                            <button type="submit" class="submit-button">
+                                <span class="btn-content">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                                        <path d="M2 17l10 5 10-5" />
+                                        <path d="M2 12l10 5 10-5" />
+                                    </svg>
+                                    <span>Tailor My CV</span>
+                                </span>
+                                <span class="btn-shimmer"></span>
+                            </button>
+                        </form>
+
+                        <div id="cv-result" class="cv-result"></div>
+                    </div>
                 </div>
-            </div>
 
-            <div id="profile-tab" class="tab-content">
-                <div class="cv-container">
-                    <div class="cv-header">
-                        <div class="cv-icon-wrapper">
-                            <span class="cv-icon">📊</span>
+                <div id="analysis-tab" class="tab-content">
+                    <div class="cv-container">
+                        <div class="cv-header">
+                            <div class="cv-icon-wrapper">
+                                <span class="cv-icon">🔍</span>
+                            </div>
+                            <h2>Job Analysis & Summarization</h2>
+                            <p class="cv-description">Analyze job descriptions and compare them with your CV</p>
                         </div>
-                        <h2>Profile Insights</h2>
-                        <p class="cv-description">Extract skills and check ATS compatibility</p>
-                    </div>
 
-                    <div class="action-buttons"
-                        style="display: flex; gap: 16px; margin-bottom: 24px; justify-content: center;">
-                        <button id="extract-skills-btn" class="submit-button" style="width: auto; padding: 12px 24px;">
-                            <span class="btn-content">Extract Skills</span>
-                        </button>
-                        <button id="ats-score-btn" class="submit-button" style="width: auto; padding: 12px 24px;">
-                            <span class="btn-content">Check ATS Score</span>
-                        </button>
-                    </div>
+                        <div class="action-buttons"
+                            style="display: flex; gap: 16px; margin-bottom: 24px; justify-content: center;">
+                            <button id="analyze-jd-btn" class="submit-button" style="width: auto; padding: 12px 24px;">
+                                <span class="btn-content">Analyze Gap</span>
+                            </button>
+                            <button id="summarize-jd-btn" class="submit-button"
+                                style="width: auto; padding: 12px 24px;">
+                                <span class="btn-content">Summarize JD</span>
+                            </button>
+                        </div>
 
-                    <form id="profile-form" class="cv-form">
-                        <div class="form-group">
-                            <label for="profile-cv-file">
-                                <span class="label-icon">📎</span>
-                                Upload Your CV (PDF)
-                            </label>
-                            <div class="file-input-wrapper">
-                                <div class="file-drop-zone">
-                                    <input type="file" id="profile-cv-file" accept=".pdf">
-                                    <div class="file-drop-content">
-                                        <span class="upload-icon">
-                                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-                                                stroke="currentColor" stroke-width="1.5">
-                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                                <polyline points="17 8 12 3 7 8" />
-                                                <line x1="12" y1="3" x2="12" y2="15" />
-                                            </svg>
-                                        </span>
-                                        <span class="drop-text">Drag & drop your CV here or click to browse</span>
-                                        <span class="file-name" id="profile-file-name">No file selected</span>
+                        <form id="analysis-form" class="cv-form">
+                            <div class="form-group">
+                                <label for="analysis-cv-file">
+                                    <span class="label-icon">📎</span>
+                                    Upload Your CV (PDF)
+                                </label>
+                                <div class="file-input-wrapper">
+                                    <div class="file-drop-zone">
+                                        <input type="file" id="analysis-cv-file" accept=".pdf">
+                                        <div class="file-drop-content">
+                                            <span class="upload-icon">
+                                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                                                    stroke="currentColor" stroke-width="1.5">
+                                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                                    <polyline points="17 8 12 3 7 8" />
+                                                    <line x1="12" y1="3" x2="12" y2="15" />
+                                                </svg>
+                                            </span>
+                                            <span class="drop-text">Drag & drop your CV here or click to browse</span>
+                                            <span class="file-name" id="analysis-file-name">No file selected</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
 
-                    <div id="profile-result" class="cv-result"></div>
+                            <div class="form-group">
+                                <label for="analysis-job-description">
+                                    <span class="label-icon">📋</span>
+                                    Job Description
+                                </label>
+                                <textarea id="analysis-job-description"
+                                    placeholder="Paste the complete job description here..." rows="8"></textarea>
+                            </div>
+                        </form>
+
+                        <div id="analysis-result" class="cv-result"></div>
+                    </div>
                 </div>
-            </div>
-        </main>
+
+                <div id="profile-tab" class="tab-content">
+                    <div class="cv-container">
+                        <div class="cv-header">
+                            <div class="cv-icon-wrapper">
+                                <span class="cv-icon">📊</span>
+                            </div>
+                            <h2>Profile Insights</h2>
+                            <p class="cv-description">Extract skills and check ATS compatibility</p>
+                        </div>
+
+                        <div class="action-buttons"
+                            style="display: flex; gap: 16px; margin-bottom: 24px; justify-content: center;">
+                            <button id="extract-skills-btn" class="submit-button"
+                                style="width: auto; padding: 12px 24px;">
+                                <span class="btn-content">Extract Skills</span>
+                            </button>
+                            <button id="ats-score-btn" class="submit-button" style="width: auto; padding: 12px 24px;">
+                                <span class="btn-content">Check ATS Score</span>
+                            </button>
+                        </div>
+
+                        <form id="profile-form" class="cv-form">
+                            <div class="form-group">
+                                <label for="profile-cv-file">
+                                    <span class="label-icon">📎</span>
+                                    Upload Your CV (PDF)
+                                </label>
+                                <div class="file-input-wrapper">
+                                    <div class="file-drop-zone">
+                                        <input type="file" id="profile-cv-file" accept=".pdf">
+                                        <div class="file-drop-content">
+                                            <span class="upload-icon">
+                                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                                                    stroke="currentColor" stroke-width="1.5">
+                                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                                    <polyline points="17 8 12 3 7 8" />
+                                                    <line x1="12" y1="3" x2="12" y2="15" />
+                                                </svg>
+                                            </span>
+                                            <span class="drop-text">Drag & drop your CV here or click to browse</span>
+                                            <span class="file-name" id="profile-file-name">No file selected</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div id="profile-result" class="cv-result"></div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Side Panel for Artifacts -->
+            <aside id="artifact-panel" class="artifact-panel glass-card">
+                <div class="artifact-header">
+                    <h3>Generated Document</h3>
+                    <button id="close-artifact-btn" class="close-btn" aria-label="Close panel">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="artifact-content">
+                    <iframe id="pdf-viewer" src="" title="PDF Viewer"></iframe>
+                </div>
+            </aside>
+        </div>
     </div>
 
     <div id="loading-overlay" class="loading-overlay">

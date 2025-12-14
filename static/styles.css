@@ -137,11 +137,16 @@ body {
 }
 
 .container {
-    max-width: 1100px;
+    width: 100%;
+    max-width: 1400px;
+    height: 100vh;
+    /* Full viewport height */
+    display: flex;
+    flex-direction: column;
     margin: 0 auto;
     padding: 24px;
     position: relative;
-    z-index: 1;
+    z-index: 10;
 }
 
 .glass-header {
@@ -253,6 +258,10 @@ body {
     display: flex;
     gap: 12px;
     margin-bottom: 24px;
+    position: relative;
+    /* Ensure z-index works */
+    z-index: 50;
+    /* Raise above header/content */
 }
 
 .tab-button {
@@ -363,10 +372,84 @@ body {
     }
 }
 
+/* --- Compact Mode Styles --- */
+.container {
+    transition: padding 0.3s ease;
+}
+
+.container.compact-mode {
+    padding-top: 12px;
+}
+
+/* Hide Main Header in Compact Mode */
+.container.compact-mode .glass-header {
+    height: 0;
+    padding: 0;
+    margin: 0;
+    opacity: 0;
+    overflow: hidden;
+    margin-bottom: 0;
+    visibility: hidden;
+    /* Ensure it's not interactive */
+    pointer-events: none;
+    /* preventative */
+    /* Minimize visual footprint */
+}
+
+/* Shrink Tabs in Compact Mode */
+.container.compact-mode .tabs {
+    gap: 8px;
+    margin-bottom: 16px;
+    justify-content: center;
+    /* Center icons */
+}
+
+.container.compact-mode .tab-button {
+    flex: 0 0 auto;
+    /* Don't stretch */
+    padding: 10px 14px;
+    /* Minimal padding */
+    border-radius: var(--radius-full);
+    /* Rounded pills */
+}
+
+.container.compact-mode .tab-label {
+    display: none;
+    /* Hide text, show only icons */
+}
+
+.container.compact-mode .tab-icon {
+    font-size: 1.25rem;
+    transform: none;
+    margin: 0;
+}
+
+.container.compact-mode .tab-button:hover {
+    transform: translateY(-1px);
+}
+
+.container.compact-mode .tab-indicator {
+    display: none;
+    /* Hide indicator in compact Icon mode */
+}
+
 .chat-container {
     display: flex;
+    /* Ensure display flex is prioritized */
     flex-direction: column;
-    height: 520px;
+    /* Height handled by flex in main layout */
+    height: 100%;
+}
+
+/* Collapse Chat Header in Compact Mode */
+.container.compact-mode .chat-header {
+    height: 0;
+    padding: 0;
+    margin: 0;
+    opacity: 0;
+    overflow: hidden;
+    border: none;
+    pointer-events: none;
 }
 
 .chat-header {
@@ -376,6 +459,7 @@ body {
     padding-bottom: 20px;
     margin-bottom: 20px;
     border-bottom: 1px solid var(--border);
+    transition: all 0.3s ease;
 }
 
 .chat-header-info {
@@ -1166,4 +1250,350 @@ body {
     .send-button {
         padding: 14px 20px;
     }
+}
+
+/* Auth Pages Styles */
+.auth-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+    position: relative;
+    z-index: 1;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 440px;
+    min-height: auto;
+    padding: 56px 48px;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 24px;
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 20px 25px -5px rgba(0, 0, 0, 0.05),
+        0 8px 10px -6px rgba(0, 0, 0, 0.01),
+        inset 0 0 40px rgba(255, 255, 255, 0.8);
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.auth-icon {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+    display: inline-block;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.auth-header h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-dark) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.auth-header p {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    font-weight: 500;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.auth-form .form-group input {
+    width: 100%;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    font-size: 1rem;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.auth-form .form-group input:focus {
+    background: #fff;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-glow);
+    outline: none;
+}
+
+.auth-form .form-group label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    display: block;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+    z-index: 10;
+}
+
+/* Main Layout for Split Screen */
+.main-layout {
+    display: flex;
+    gap: 24px;
+    flex: 1;
+    /* Take remaining space */
+    min-height: 0;
+    /* Allow shrinking for scrolling */
+    position: relative;
+    width: 100%;
+    max-width: 1400px;
+    /* Increased max-width to accommodate side panel */
+    margin: 0 auto;
+    padding-bottom: 24px;
+}
+
+.content.glass-card {
+    flex: 1;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    /* Enable scrolling */
+    overflow-x: hidden;
+    /* Flex properties handled in main-layout context now */
+    min-width: 0;
+    /* Prevent flex overflow */
+}
+
+/* Artifact Side Panel */
+.artifact-panel {
+    width: 0;
+    opacity: 0;
+    visibility: hidden;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.05);
+    /* Softer shadow */
+    border-left: 1px solid var(--border);
+    min-height: 0;
+    /* CRITICAL: Allows flex child to shrink and scroll */
+}
+
+.artifact-panel.open {
+    width: 50%;
+    opacity: 1;
+    visibility: visible;
+    margin-left: 0;
+    padding: 0;
+}
+
+.artifact-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+}
+
+.artifact-header h3 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Artifact Card in Analysis View */
+.artifact-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface-solid);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 24px;
+    transition: all 0.2s ease;
+}
+
+.artifact-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+}
+
+.artifact-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+}
+
+.artifact-info {
+    flex: 1;
+}
+
+.artifact-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.artifact-meta {
+    font-size: 0.85rem;
+    color: var(--text-tertiary);
+}
+
+.artifact-arrow {
+    color: var(--text-tertiary);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 4px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--error);
+}
+
+.artifact-content {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    overflow-y: auto;
+    /* Allow scrolling for Text/HTML content */
+    background: #f8f9fa;
+    /* Light background for PDF contrast */
+}
+
+#pdf-viewer {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Adjustments when side panel is open */
+.main-layout.has-artifact .content.glass-card {
+    width: 50%;
+}
+
+/* Ensure container allows expansion */
+.container {
+    max-width: 1400px;
+}
+
+.password-toggle:hover {
+    color: var(--primary);
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+.auth-footer a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 700;
+    transition: color 0.2s;
+}
+
+.auth-footer a:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+.error-message {
+    color: #b91c1c;
+    background-color: #fef2f2;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 20px;
+    display: none;
+    border: 1px solid #fecaca;
+    text-align: center;
 }

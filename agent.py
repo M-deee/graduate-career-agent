@@ -1,43 +1,59 @@
 import os
 from typing import List, Dict
 from huggingface_hub import InferenceClient
+import config
 
 class Agent:
-    def __init__(self, model: str = "meta-llama/Llama-3.1-8B-Instruct", system_prompt: str = "You are a professional career coach specializing in helping fresh graduates secure jobs, internships, and scholarships. Provide precise, practical guidance. When rewriting CVs or documents, follow best industry standards, use clear and concise language, and focus on measurable achievements. Always maintain accuracy and avoid inventing information."):
-        self.model = model
+    def __init__(self, system_prompt: str = config.SYSTEM_PROMPT):
         self.system_prompt = system_prompt
+        # Legacy history format for chat
         self.history: List[Dict[str, str]] = [
             {"role": "system", "content": system_prompt}
         ]
-        # Hardcoded token as per previous user request/fix
-        self.api_token = os.getenv("HF_TOKEN")
         
-        print(f"HF KEY loaded: {bool(self.api_token)}") # Debug print as requested
+        self.api_token = os.getenv("HF_TOKEN")
+        print(f"HF KEY loaded: {bool(self.api_token)}")
         
         if not self.api_token:
             print("Warning: HF_TOKEN is not set.")
             
-        self.client = InferenceClient(model=self.model, token=self.api_token)
+        # Initialize two clients
+        self.general_client = InferenceClient(model=config.GENERAL_MODEL, token=self.api_token)
+        self.code_client = InferenceClient(model=config.CODE_MODEL, token=self.api_token)
 
-    def chat(self, user_input: str) -> str:
+    def chat(self, user_input: str, history: List[Dict[str, str]] = None) -> str:
         """
         Sends a message to the Hugging Face Inference API using InferenceClient.
+        If history is provided, it uses that context instead of the internal self.history details.
         """
         if not self.api_token:
             return "Error: HF_TOKEN is not set. Please set it to use the agent."
 
-        self.history.append({"role": "user", "content": user_input})
+        # Use provided history or fallback to internal history (legacy support)
+        messages = history if history is not None else self.history
+
+        # Appending new message is handled by caller (main.py) when using DB history,
+        # but if we are using internal history, we must append it.
+        if history is None:
+            self.history.append({"role": "user", "content": user_input})
+        else:
+            # When using DB history, the caller constructs the list, but we need to ensure
+            # the current user input is in the messages sent to the model.
+            messages.append({"role": "user", "content": user_input})
 
         try:
-            response = self.client.chat_completion(
-                messages=self.history,
+            # Use General Model
+            response = self.general_client.chat_completion(
+                messages=messages,
                 max_tokens=512,
                 temperature=0.7,
                 top_p=0.9
             )
             
             assistant_message = response.choices[0].message.content
-            self.history.append({"role": "assistant", "content": assistant_message})
+            
+            if history is None:
+                self.history.append({"role": "assistant", "content": assistant_message})
             
             return assistant_message
         except Exception as e:
@@ -47,55 +63,69 @@ class Agent:
     def tailor_cv(self, cv_text: str, job_description: str) -> str:
         """
         Analyzes the CV and Job Description to provide a tailored version.
+        USES CODE MODEL.
         """
         if not self.api_token:
             return "Error: HF_TOKEN is not set."
 
         prompt = f"""
-        You will receive a Job Description (JD) and a CV. Rewrite the CV so that it aligns more closely with the JD.
+        You are a CV Tailoring Expert. Your task is to extract the user's CV content and rewrite it to be perfectly tailored to the Job Description (JD).
 
-        Your tasks:
-        1. Strengthen the summary to match the employer's needs.
-        2. Emphasize relevant skills and experience from the CV—do not invent information.
-        3. Improve bullet points using action verbs and measurable impact where appropriate.
-        4. Remove irrelevant details that do not support the JD.
-        5. Maintain clarity, structure, and a professional tone.
+        **INSTRUCTION**: Provide a clean, well-structured Markdown version of the CV.
 
-        Return:
-        1. A complete, compilable LaTeX file using the `moderncv` class.
-        2. A short, bullet-point explanation describing what changes were made and why.
+        **Structure of your response:**
+        1. **Analysis**: A brief bulleted list of 3-4 key changes you made and why.
+        2. **Tailored CV**: The COMPLETE Markdown CV wrapped strictly in `[CV_START]` and `[CV_END]`.
 
-        IMPORTANT:
-        - Use the `moderncv` class:
-          \\documentclass[11pt,a4paper,sans]{{moderncv}}
-          \\moderncvstyle{{classic}}
-          \\moderncvcolor{{blue}}
-        - Wrap the LaTeX code strictly between `[LATEX_START]` and `[LATEX_END]` tags for extraction.
-        - Ensure all special characters are properly escaped for LaTeX.
+        **Output Format:**
+        Analysis:
+        - ...
+        - ...
+
+        [CV_START]
+        # Name
+        ## Contact Info
+
+        ## Profile
+        ...
+
+        ## Experience
+        ...
+        [CV_END]
+
+        **Rules:**
+        - NO conversational text.
+        - The CV must be in standard Markdown (headers, bullet points).
+        - Focus on professional formatting.
 
         JOB DESCRIPTION:
         {job_description}
 
-        CV TO TAILOR:
+        CV CONTENT:
         {cv_text}
         """
         
-        # We don't add this to the main chat history to keep the context clean, 
-        # or we can if we want the user to be able to ask follow-ups.
-        # Let's add it to history so they can ask "Why did you change X?"
+        # Note: We don't append to self.history for this specific task to be cleaner, 
+        # or we could. But since we use different models, sharing history is tricky.
+        # We'll treat this as stateless for the agent's memory or just not save it.
+        # But previous implementation did append. Let's create a temp message list.
         
-        self.history.append({"role": "user", "content": f"Please tailor my CV for this job:\n\n{job_description}\n\nMy CV content:\n{cv_text}"})
-        
+        messages = [
+            {"role": "system", "content": self.system_prompt},
+            {"role": "user", "content": prompt}
+        ]
+
         try:
-            response = self.client.chat_completion(
-                messages=self.history,
-                max_tokens=1024, # Need more tokens for CV generation
-                temperature=0.7,
+            # Use Code Model
+            response = self.code_client.chat_completion(
+                messages=messages,
+                max_tokens=2048, # More tokens for CV code
+                temperature=0.2, # Lower temp for code precision
                 top_p=0.9
             )
             
             assistant_message = response.choices[0].message.content
-            self.history.append({"role": "assistant", "content": assistant_message})
+            # self.history.append({"role": "assistant", "content": assistant_message}) # Skip history for specialized task
             
             return assistant_message
         except Exception as e:
@@ -183,12 +213,13 @@ class Agent:
         return self._simple_chat(prompt)
 
     def _simple_chat(self, prompt: str) -> str:
-        """Helper for single-turn requests without history."""
+        """Helper for single-turn requests without history. Uses General Model."""
         if not self.api_token:
             return "Error: HF_TOKEN is not set."
             
         try:
-            response = self.client.chat_completion(
+            # Use General Model
+            response = self.general_client.chat_completion(
                 messages=[
                     {"role": "system", "content": self.system_prompt},
                     {"role": "user", "content": prompt}
